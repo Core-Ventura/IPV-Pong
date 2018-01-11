@@ -21,7 +21,15 @@ var res = {
     grunt_wav : "res/grunt.wav",
     sonidobucle_wav : "res/sonidobucle.wav",
     animacion_bola_png : "res/animacion_bola.png",
-    animacion_bola_plist : "res/animacion_bola.plist"
+    animacion_bola_plist : "res/animacion_bola.plist",
+
+    luna_png : "res/luna.png",
+    goal_wav: "res/goal.wav",
+    bounce_wav: "res/bounce.wav",
+    space_jpg: "res/space.jpg",
+    barra_azul_png: "res/barra_azul.png",
+    barra_rojo_png: "res/barra_rojo.png",
+    boton_nueva_partida_png: "res/boton_nueva_partida.png"
 };
 
 var g_resources = [];

@@ -33,37 +33,37 @@ var GameLayer = cc.Layer.extend({
         this.scoreToWin = 3;
 
         // Fondo
-        var spriteFondo = cc.Sprite.create(res.fondo_png);
+        var spriteFondo = cc.Sprite.create(res.space_jpg);
         spriteFondo.setPosition(cc.p(size.width/2, size.height/2));
         spriteFondo.setScale(size.width / spriteFondo.width);
         this.addChild(spriteFondo);
 
         // Pelota
-        this.spritePelota = cc.Sprite.create(res.bola_png);
+        this.spritePelota = cc.Sprite.create(res.luna_png);
         this.spritePelota.setPosition( cc.p( size.width/2 , size.height/2 )  );
         this.addChild(this.spritePelota);
 
         // Barra jugador
-        this.spriteBarra = cc.Sprite.create(res.barra_2_png);
+        this.spriteBarra = cc.Sprite.create(res.barra_azul_png);
         this.spriteBarra.setPosition(cc.p(size.width*0.1, size.height*0.5 ));
         this.spriteBarra.rotation = 90;
         this.addChild(this.spriteBarra);
 
         // Barra IA
-        this.spriteBarraIA = cc.Sprite.create(res.barra_2_png);
+        this.spriteBarraIA = cc.Sprite.create(res.barra_rojo_png);
         this.spriteBarraIA.setPosition(cc.p(size.width*0.9, size.height*0.5 ));
         this.spriteBarraIA.rotation = 90;
         this.addChild(this.spriteBarraIA);
 
         // Puntuación jugador
-        this.labelScorePlayer = new cc.LabelTTF(this.scorePlayer.toString());
-        this.labelScorePlayer.setFontSize(80);
+        this.labelScorePlayer = new cc.LabelTTF(this.scorePlayer.toString(), "Lobster");
+        this.labelScorePlayer.setFontSize(60);
         this.labelScorePlayer.setPosition(cc.p(size.width*0.4, size.height*0.9));
         this.addChild(this.labelScorePlayer);
 
         // Puntuación IA
-        this.labelScoreIA = new cc.LabelTTF(this.scoreIA.toString());
-        this.labelScoreIA.setFontSize(80);
+        this.labelScoreIA = new cc.LabelTTF(this.scoreIA.toString(), "Lobster");
+        this.labelScoreIA.setFontSize(60);
         this.labelScoreIA.setPosition(cc.p(size.width*0.6, size.height*0.9));
         this.addChild(this.labelScoreIA);
 
@@ -118,6 +118,8 @@ var GameLayer = cc.Layer.extend({
         // Mover pelota
         this.spritePelota.x = this.spritePelota.x + this.velocidadX;
         this.spritePelota.y = this.spritePelota.y + this.velocidadY;
+        // La rotamos
+        this.spritePelota.rotation += 10;
 
         // Mover barra enemiga
         if (this.spriteBarraIA.y < 400 && this.spritePelota.y > this.spriteBarraIA.y){
@@ -134,6 +136,7 @@ var GameLayer = cc.Layer.extend({
             this.spritePelota.x = cc.winSize.width/2;
             this.spritePelota.y = cc.winSize.height/2;
             this.velocidadX = this.velocidadX*-1;
+            cc.audioEngine.playEffect(res.goal_wav);
 
         }
 
@@ -145,14 +148,17 @@ var GameLayer = cc.Layer.extend({
             this.spritePelota.x = cc.winSize.width/2;
             this.spritePelota.y = cc.winSize.height/2;
             this.velocidadX = this.velocidadX*-1;
+            cc.audioEngine.playEffect(res.goal_wav);
         }
         if (this.spritePelota.y < 0){
             this.spritePelota.y = 0;
             this.velocidadY = this.velocidadY*-1;
+            cc.audioEngine.playEffect(res.bounce_wav);
         }
         if (this.spritePelota.y > cc.winSize.height){
             this.spritePelota.y = cc.winSize.height;
             this.velocidadY = this.velocidadY*-1;
+            cc.audioEngine.playEffect(res.bounce_wav);
         }
 
        // Colisiones
@@ -163,7 +169,7 @@ var GameLayer = cc.Layer.extend({
         if(cc.rectIntersectsRect(areaPelota, areaBarra) || 
             cc.rectIntersectsRect(areaPelota, areaBarraIA)){
                 console.log("Collision");
-                cc.audioEngine.playEffect(res.grunt_wav);
+                cc.audioEngine.playEffect(res.bounce_wav);
                 this.velocidadX = this.velocidadX*-1;
         }
     }
