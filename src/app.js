@@ -5,23 +5,43 @@ var GameLayer = cc.Layer.extend({
     velocidadY:null,
     spriteCoche: null,
     spriteBarra:null,
+    spriteBarraIA: null,
+    dificultad:null,
     ctor:function () {
         this._super();
         var size = cc.winSize;
         // Hasta aqui lo comun
 
+        // 1 = Fácil
+        // 2 = Normal
+        // 3 = Difícil
+        // 4 = Imposible
+        this.dificultad = 3;
         this.velocidadX = 6;
         this.velocidadY = 4;
+
+        //Fondo
+        var spriteFondo = cc.Sprite.create(res.fondo_png);
+        spriteFondo.setPosition(cc.p(size.width/2, size.height/2));
+        spriteFondo.setScale(size.width / spriteFondo.width);
+        this.addChild(spriteFondo);
 
         // Pelota
         this.spritePelota = cc.Sprite.create(res.bola_png);
         this.spritePelota.setPosition( cc.p( size.width/2 , size.height/2 )  );
         this.addChild(this.spritePelota);
 
-        // Barra
+        // Barra aliada
         this.spriteBarra = cc.Sprite.create(res.barra_2_png);
-        this.spriteBarra.setPosition(cc.p(cc.winSize.width*0.5 , size.height*0.1 ));
+        this.spriteBarra.setPosition(cc.p(size.width*0.1, size.height*0.5 ));
+        this.spriteBarra.rotation = 90;
         this.addChild(this.spriteBarra);
+
+        // Barra enemiga
+        this.spriteBarraIA = cc.Sprite.create(res.barra_2_png);
+        this.spriteBarraIA.setPosition(cc.p(size.width*0.9, size.height*0.5 ));
+        this.spriteBarraIA.rotation = 90;
+        this.addChild(this.spriteBarraIA);
 
 
         cc.eventManager.addListener({
@@ -35,19 +55,23 @@ var GameLayer = cc.Layer.extend({
         }, this);
 
 
-
         this.scheduleUpdate();
 
         return true;
 
+        //Keycodes:
+        //37 = left arrow
+        //38 = up arrow
+        //39 = right arrow
+        //40 = down arrow
     }, teclaPulsada: function( keyCode, event ){
          var instancia = event.getCurrentTarget();
          console.log(keyCode);
-         if ( keyCode == 37 ){
-            instancia.spriteBarra.x =  instancia.spriteBarra.x - 14;
+         if ( keyCode == 38 && instancia.spriteBarra.y < 400){ 
+            instancia.spriteBarra.y =  instancia.spriteBarra.y + 10;
          }
-         if ( keyCode == 39 ){
-            instancia.spriteBarra.x =  instancia.spriteBarra.x + 14;
+         if ( keyCode == 40 && instancia.spriteBarra.y > 50){
+            instancia.spriteBarra.y =  instancia.spriteBarra.y - 10;
          }
 
     }, procesarMouseDown: function ( event ){
@@ -59,30 +83,46 @@ var GameLayer = cc.Layer.extend({
         event.getCurrentTarget().spritePelota.runAction(actionMoverPelota);
 
     }, update: function(){
+
+        //Mover pelota
         this.spritePelota.x = this.spritePelota.x + this.velocidadX;
         this.spritePelota.y = this.spritePelota.y + this.velocidadY;
 
-       if (this.spritePelota.x < 0){
-           this.spritePelota.x = 0;
-           this.velocidadX = this.velocidadX*-1;
-       }
-       if (this.spritePelota.x > cc.winSize.width){
-           this.spritePelota.x = cc.winSize.width;
-           this.velocidadX = this.velocidadX*-1;
-       }
-       if (this.spritePelota.y < 0){
-           this.spritePelota.y = 0;
-           this.velocidadY = this.velocidadY*-1;
-       }
-       if (this.spritePelota.y > cc.winSize.height){
-           this.spritePelota.y = cc.winSize.height;
-           this.velocidadY = this.velocidadY*-1;
-       }
+        //Mover barra enemiga
+        if (this.spriteBarraIA.y < 400 && this.spritePelota.y > this.spriteBarraIA.y){
+            this.spriteBarraIA.y = this.spriteBarraIA.y + this.dificultad;
+        } else if (this.spriteBarraIA.y > 50 && this.spritePelota.y < this.spriteBarraIA.y){
+            this.spriteBarraIA.y = this.spriteBarraIA.y - this.dificultad;
+        }
 
+        if (this.spritePelota.x < 0){
+            this.spritePelota.x = 0;
+            this.velocidadX = this.velocidadX*-1;
+        }
+        if (this.spritePelota.x > cc.winSize.width){
+            this.spritePelota.x = cc.winSize.width;
+            this.velocidadX = this.velocidadX*-1;
+        }
+        if (this.spritePelota.y < 0){
+            this.spritePelota.y = 0;
+            this.velocidadY = this.velocidadY*-1;
+        }
+        if (this.spritePelota.y > cc.winSize.height){
+            this.spritePelota.y = cc.winSize.height;
+            this.velocidadY = this.velocidadY*-1;
+        }
 
+       //Colisiones
+        var areaPelota = this.spritePelota.getBoundingBox();
+        var areaBarra = this.spriteBarra.getBoundingBox();
+        var areaBarraIA = this.spriteBarraIA.getBoundingBox();
+
+        if(cc.rectIntersectsRect(areaPelota, areaBarra) || 
+            cc.rectIntersectsRect(areaPelota, areaBarraIA)){
+                console.log("Collision");
+                this.velocidadX = this.velocidadX*-1;
+        }
     }
-
-
 
 });
 
